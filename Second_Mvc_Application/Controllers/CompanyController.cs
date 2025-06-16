@@ -134,11 +134,12 @@ namespace Second_Mvc_Application.Controllers
                 return View(companyModel);
             }
         }
-        public ActionResult Details(int? Id = 0)
+        public ActionResult Details(int Id = 0)
         {
-            return View();
-        }
+            CompanyModel model = FillcompanyDetilas(Id);
 
+            return View(model);
+        }
         public static CompanyModel FillcompanyDetilas(int Id)
         {
             CompanyModel model = new CompanyModel();
