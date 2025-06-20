@@ -15,13 +15,34 @@ namespace Second_Mvc_Application.Controllers
         public ActionResult Index()
         {
             List<LocationModel> ListModel = new List<LocationModel>();
+            LocationQuery query = new LocationQuery();
+
+            DataTable dt = query.GetLocationDetails();
+
+            if (dt.Rows.Count > 0)
+            {
+                foreach (DataRow dr in dt.Rows)
+                {
+                    LocationModel locationModel = new LocationModel();
+
+                    locationModel.LocNo = Convert.ToInt32(dr["LocNo"]);
+                    locationModel.LocName = Convert.ToString(dr["LocName"]);
+                    locationModel.Remarks = Convert.ToString(dr["Remarks"]);
+
+                    locationModel.CompName = Convert.ToString(dr["Comp_name"]);
+
+                    ListModel.Add(locationModel);
+                }
+            }
             return View(ListModel);
         }
 
         // GET: Location/Details/5
         public ActionResult Details(int id)
         {
-            return View();
+            LocationModel locationModel = FillLocationDetails(id);
+            ViewBag.Company = LoadCompany(locationModel.CompNo);
+            return View(locationModel);
         }
 
         // GET: Location/Create
@@ -49,6 +70,7 @@ namespace Second_Mvc_Application.Controllers
 
                 if (Res > 0)
                 {
+                    TempData["Message"] = "Data Inserted Sucessfuly";
                     return RedirectToAction("Index");
                 }
             }
@@ -63,29 +85,52 @@ namespace Second_Mvc_Application.Controllers
         // GET: Location/Edit/5
         public ActionResult Edit(int id)
         {
-            return View();
+            LocationModel locationModel = FillLocationDetails(id);
+            ViewBag.Company = LoadCompany(locationModel.CompNo);
+            return View(locationModel);
         }
 
         // POST: Location/Edit/5
         [HttpPost]
         public ActionResult Edit(int id, FormCollection collection)
         {
+            LocationModel model = new LocationModel();
             try
             {
-                // TODO: Add update logic here
+                // TODO: Add insert logic here
+                model.LocNo = id;
+                model.CompNo = Convert.ToInt32(collection["CompName1"]);
+                model.LocName = Convert.ToString(collection["LocName"]);
+                model.Remarks = Convert.ToString(collection["Remarks"]);
 
-                return RedirectToAction("Index");
+                LocationQuery Location = new LocationQuery();
+                int Res = Location.Updatedata(model);
+
+                if (Res > 0)
+                {
+                    TempData["Message"] = "Data Update Sucessfuly";
+                    return RedirectToAction("Index");
+                }
+                else
+                {
+                    TempData["Message"] = "Data Update Faild";
+                }
             }
             catch
             {
                 return View();
             }
+            model = FillLocationDetails(id);
+            ViewBag.Company = LoadCompany(model.CompNo);
+            return View(model);
         }
 
         // GET: Location/Delete/5
         public ActionResult Delete(int id)
         {
-            return View();
+            LocationModel locationModel = FillLocationDetails(id);
+            ViewBag.Company = LoadCompany(locationModel.CompNo);
+            return View(locationModel);
         }
 
         // POST: Location/Delete/5
@@ -95,8 +140,18 @@ namespace Second_Mvc_Application.Controllers
             try
             {
                 // TODO: Add delete logic here
-
-                return RedirectToAction("Index");
+                LocationQuery query = new LocationQuery();
+                if (query.DeleteData(id) > 0)
+                {
+                    TempData["Message"] = "Delete Data Successfull";
+                    return RedirectToAction("Index");
+                }
+                else
+                {
+                    LocationModel locationModel = FillLocationDetails(id);
+                    ViewBag.Company = LoadCompany(locationModel.CompNo);
+                    return View(locationModel);
+                }
             }
             catch
             {
@@ -119,11 +174,33 @@ namespace Second_Mvc_Application.Controllers
                     {
                         Text = Convert.ToString(dr["Comp_Name"]),
                         Value = Convert.ToString(dr["COMP_NO"]),
-                        Selected = CompNo == Convert.ToInt32(dr["COMP_NO"])
+                        Selected = (Convert.ToInt32(dr["Comp_No"]) == CompNo)
                     });
                 }
             }
             return LisCompany;
+        }
+
+        public LocationModel FillLocationDetails(int Id)
+        {
+            LocationModel locationModel = new LocationModel();
+
+            LocationQuery query = new LocationQuery();
+
+            DataTable dt = query.GetLocationDetails(Id);
+
+            if (dt.Rows.Count > 0)
+            {
+                foreach (DataRow dr in dt.Rows)
+                {
+                    locationModel.LocNo = Convert.ToInt32(dr["LocNo"]);
+                    locationModel.LocName = Convert.ToString(dr["LocName"]);
+                    locationModel.Remarks = Convert.ToString(dr["Remarks"]);
+                    locationModel.CompName = Convert.ToString(dr["Comp_name"]);
+                    locationModel.CompNo = Convert.ToInt32(dr["CompNo"]);
+                }
+            }
+            return locationModel;
         }
     }
 }

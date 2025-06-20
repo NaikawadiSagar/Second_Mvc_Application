@@ -44,9 +44,9 @@
                 @Html.DisplayFor(modelItem => item.CompName)
             </td>
             <td>
-                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+                @Html.ActionLink("Edit", "Edit", new { id = item.LocNo }) |
+                @Html.ActionLink("Details", "Details", new { id = item.LocNo }) |
+                @Html.ActionLink("Delete", "Delete", new { id = item.LocNo })
             </td>
         </tr>
     }
@@ -58,3 +58,15 @@
         window.location.href = '@Url.Action("Create", "Location")';
     }
 </script>
+
+@if (TempData["Message"] != null)
+{
+    <script type="text/javascript">
+        window.onload = function () {
+            var msg = '@TempData["Message"]'
+            if (msg) {
+                alert(msg)
+            }
+        }
+    </script>
+}
